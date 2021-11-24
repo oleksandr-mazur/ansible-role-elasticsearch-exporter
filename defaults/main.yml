@@ -1,0 +1,18 @@
+---
+# elasticsearch exporter variables
+
+name: elasticsearch_exporter
+version: "1.3.0"
+git_url: "https://github.com/justwatchcom/elasticsearch_exporter/releases/download/v{{ version}}/elasticsearch_exporter-{{ version }}.linux-amd64.tar.gz"
+archive_path: "$HOME/{{ name }}-{{ version }}.tar.gz"
+tar_option: "{{ name }}-{{ version }}.linux-amd64/{{ name }}"
+es_port: 9200
+es_host: "localhost"
+
+binary_name: "{{ name }}"
+binary_run_args: "--web.listen-address={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:9114 --es.uri='http://{{ es_host }}:{{ es_port }}' {{ args }}"
+
+user: "{{ name }}"
+group: "{{ name }}"
+
+

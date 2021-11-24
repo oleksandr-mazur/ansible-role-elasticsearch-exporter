@@ -1,0 +1,49 @@
+---
+- name: Download binary {{ name }}
+  become: yes
+  get_url:
+    url: "{{ git_url }}"
+    dest: "{{ archive_path }}"
+
+- name: Unarchive a file that is already on the remote machine
+  become: yes
+  unarchive:
+    src: "{{ archive_path }}"
+    dest: /usr/sbin
+    remote_src: yes
+    mode: +x
+    extra_opts:
+        - --strip-components=1
+        -  "{{ tar_option }}"
+
+- name: Create group for user {{ user }}
+  become: True
+  group:
+    state: present
+    name: "{{ group }}"
+
+- name: Create user {{ user }}
+  become: yes
+  user:
+    create_home: no
+    state: present
+    name: "{{ user }}"
+    group: "{{ group }}"
+    shell: /sbin/nologin
+
+- shell: "netstat -ntlp|grep {{ es_port }}|awk '{print $4}'|cut -f1 -d:"
+  register: elastic_interface
+
+- name: get elastic interface
+  set_fact:
+    elastic_interface: {{ elastic_interface.stdout }}
+
+- name: Create systemd service for {{ name }}
+  become: yes
+  template:
+    src: "templates/etc/systemd/system/service.j2"
+    dest: "/etc/systemd/system/{{ name }}.service"
+  notify: "restart service"
+
+
+

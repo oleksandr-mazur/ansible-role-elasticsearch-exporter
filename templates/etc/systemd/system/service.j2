@@ -1,0 +1,10 @@
+[Unit]
+Description=Prometheus {{ ' '.join(name.split('_')) }}
+
+[Service]
+User={{ user }}
+Group={{ group }}
+ExecStart=/usr/sbin/{{ binary_name }} {{ binary_run_args }}
+
+[Install]
+WantedBy=multi-user.target
